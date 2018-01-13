@@ -49,7 +49,10 @@ func readMSR(offset int64, cpu int) (uint64, error) {
 	}
 	defer f.Close()
 
-	f.Seek(offset, io.SeekStart)
+	if _, err = f.Seek(offset, io.SeekStart); err != nil {
+		return 0, err
+	}
+
 	data := make([]byte, 8)
 	if _, err = f.Read(data); err != nil {
 		return 0, err
@@ -66,7 +69,10 @@ func writeMSR(offset int64, cpu int, value uint64) error {
 	}
 	defer f.Close()
 
-	f.Seek(offset, io.SeekStart)
+	if _, err = f.Seek(offset, io.SeekStart); err != nil {
+		return err
+	}
+
 	data := make([]byte, 8)
 	binary.LittleEndian.PutUint64(data, value)
 	_, err = f.Write(data)
