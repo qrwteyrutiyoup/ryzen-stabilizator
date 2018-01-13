@@ -1,0 +1,12 @@
+[Unit]
+Description=Ryzen Stabilizator Tabajara
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+ExecStart=/usr/bin/ryzen-stabilizator --disable-c6
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
