@@ -17,7 +17,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"runtime"
 )
@@ -46,7 +45,6 @@ func readMSR(offset int64, cpu int) (uint64, error) {
 	fname := fmt.Sprintf("/dev/cpu/%d/msr", cpu)
 	f, err := os.OpenFile(fname, os.O_RDONLY, 0666)
 	if err != nil {
-		log.Printf("Problem opening file %q for reading. offset: %d, cpu: %d, error: %v\n", fname, offset, cpu, err)
 		return 0, err
 	}
 	defer f.Close()
@@ -54,7 +52,6 @@ func readMSR(offset int64, cpu int) (uint64, error) {
 	f.Seek(offset, io.SeekStart)
 	data := make([]byte, 8)
 	if _, err = f.Read(data); err != nil {
-		log.Printf("Problem reading from file %q. offset: %d, cpu: %d, error: %v\n", fname, offset, cpu, err)
 		return 0, err
 	}
 	return binary.LittleEndian.Uint64(data), nil
@@ -65,7 +62,6 @@ func writeMSR(offset int64, cpu int, value uint64) error {
 	fname := fmt.Sprintf("/dev/cpu/%d/msr", cpu)
 	f, err := os.OpenFile(fname, os.O_WRONLY, 0666)
 	if err != nil {
-		log.Printf("Problem opening file %q for writing. offset: %d, cpu: %d, error: %v\n", fname, offset, cpu, err)
 		return err
 	}
 	defer f.Close()
@@ -74,9 +70,6 @@ func writeMSR(offset int64, cpu int, value uint64) error {
 	data := make([]byte, 8)
 	binary.LittleEndian.PutUint64(data, value)
 	_, err = f.Write(data)
-	if err != nil {
-		log.Printf("Error writing to MSR. offset: %d, cpu: %d, data: %d, error: %v\n", offset, cpu, data, err)
-	}
 	return err
 }
 
