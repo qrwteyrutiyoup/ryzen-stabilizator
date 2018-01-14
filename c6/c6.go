@@ -16,7 +16,6 @@ package c6
 import (
 	"encoding/binary"
 	"fmt"
-	"io"
 	"os"
 	"runtime"
 )
@@ -49,12 +48,8 @@ func readMSR(offset int64, cpu int) (uint64, error) {
 	}
 	defer f.Close()
 
-	if _, err = f.Seek(offset, io.SeekStart); err != nil {
-		return 0, err
-	}
-
 	data := make([]byte, 8)
-	if _, err = f.Read(data); err != nil {
+	if _, err = f.ReadAt(data, offset); err != nil {
 		return 0, err
 	}
 	return binary.LittleEndian.Uint64(data), nil
@@ -69,13 +64,9 @@ func writeMSR(offset int64, cpu int, value uint64) error {
 	}
 	defer f.Close()
 
-	if _, err = f.Seek(offset, io.SeekStart); err != nil {
-		return err
-	}
-
 	data := make([]byte, 8)
 	binary.LittleEndian.PutUint64(data, value)
-	_, err = f.Write(data)
+	_, err = f.WriteAt(data, offset)
 	return err
 }
 
