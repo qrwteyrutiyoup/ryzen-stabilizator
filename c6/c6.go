@@ -70,7 +70,7 @@ func writeMSR(offset int64, cpu int, value uint64) error {
 	return err
 }
 
-// changeC6 eithers enable or disable the C6 (both core and package) C-state,
+// changeC6 either enables or disables the C6 (both core and package) C-state,
 // depending on whether the provided parameter is true or false, respectively.
 func changeC6(enable bool) error {
 	cpus := runtime.NumCPU()
