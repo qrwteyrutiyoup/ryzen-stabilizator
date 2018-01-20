@@ -1,0 +1,13 @@
+[Unit]
+Description=Ryzen Stabilizator Tabajara - Resume
+After=suspend.target
+PartOf=ryzen-stabilizator.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+ExecStart=/usr/bin/ryzen-stabilizator --disable-c6
+
+[Install]
+WantedBy=suspend.target

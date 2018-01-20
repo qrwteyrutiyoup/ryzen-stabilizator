@@ -1,0 +1,12 @@
+[Unit]
+Description=Ryzen Stabilizator Tabajara - Boot
+PartOf=ryzen-stabilizator.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+ExecStart=/usr/bin/ryzen-stabilizator --disable-c6
+
+[Install]
+WantedBy=multi-user.target
