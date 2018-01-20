@@ -21,7 +21,17 @@ import (
 	"github.com/qrwteyrutiyoup/ryzen-stabilizator/c6"
 )
 
+const (
+	program   = "Ryzen Stabilizator Tabajara"
+	copyright = "Copyright (C) 2018 Sergio Correia <sergio@correia.cc>"
+)
+
+var (
+	version = "unspecified/git version"
+)
+
 func main() {
+	fmt.Printf("%s %s\n%s\n\n", program, version, copyright)
 	// Check if we are running as root.
 	if os.Geteuid() != 0 {
 		fmt.Printf("You need to be root to use this program.\n")
