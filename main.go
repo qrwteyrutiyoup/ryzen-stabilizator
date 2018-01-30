@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/qrwteyrutiyoup/ryzen-stabilizator/boosting"
 	"github.com/qrwteyrutiyoup/ryzen-stabilizator/c6"
 )
 
@@ -40,34 +41,70 @@ func main() {
 
 	enablePtr := flag.Bool("enable-c6", false, "Enable C6 C-state")
 	disablePtr := flag.Bool("disable-c6", false, "Disable C6 C-state")
+	enableBoosting := flag.Bool("enable-boosting", false, "Enable processor boosting")
+	disableBoosting := flag.Bool("disable-boosting", false, "Disable processor boosting")
 	flag.Parse()
 
+	// C6.
 	switch {
 	case *disablePtr:
 		fmt.Printf("Disabling C6 C-state:   ")
 		err := c6.Disable()
 		if err != nil {
-			fmt.Printf("oops: %v\n", err)
+			fmt.Printf("oops: %v\n\n", err)
 			break
 		}
-		fmt.Printf("SUCCESS\n")
+		fmt.Printf("SUCCESS\n\n")
 	case *enablePtr:
 		fmt.Printf("Enabling C6 C-state:   ")
 		err := c6.Enable()
 		if err != nil {
-			fmt.Printf("oops: %v\n", err)
+			fmt.Printf("oops: %v\n\n", err)
 			break
 		}
-		fmt.Printf("SUCCESS\n")
-	default:
-		enabled, err := c6.Enabled()
-		if err != nil {
-			fmt.Printf("Error while obtaining status of C6 C-state: %v\n", err)
-		}
-		status := "C6 C-state is DISABLED."
-		if enabled {
-			status = "C6 C-state is ENABLED."
-		}
-		fmt.Println(status)
+		fmt.Printf("SUCCESS\n\n")
 	}
+
+	// Boosting.
+	switch {
+	case *disableBoosting:
+		fmt.Printf("Disabling processor boosting:   ")
+		err := boosting.Disable()
+		if err != nil {
+			fmt.Printf("oops: %v\n\n", err)
+			break
+		}
+		fmt.Printf("SUCCESS\n\n")
+	case *enableBoosting:
+		fmt.Printf("Enabling processor boosting:   ")
+		err := boosting.Enable()
+		if err != nil {
+			fmt.Printf("oops: %v\n\n", err)
+			break
+		}
+		fmt.Printf("SUCCESS\n\n")
+	}
+
+	// Current status of both C6 C-state and processor boosting.
+	c6Status := "C6 C-state is DISABLED."
+	c6Enabled, err := c6.Enabled()
+	if err == nil {
+		if c6Enabled {
+			c6Status = "C6 C-state is ENABLED."
+		}
+	} else {
+		c6Status = fmt.Sprintf("Error while obtaining status of C6 C-state: %v", err)
+	}
+	fmt.Println(c6Status)
+
+	boostingEnabled, err := boosting.Enabled()
+	boostingStatus := "Processor boosting is DISABLED."
+	if err == nil {
+		if boostingEnabled {
+			boostingStatus = "Processor boosting is ENABLED."
+		}
+	} else {
+		boostingStatus = fmt.Sprintf("Error while obtaining status of processor boosting: %v", err)
+	}
+	fmt.Println(boostingStatus)
 }
