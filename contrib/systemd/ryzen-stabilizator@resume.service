@@ -7,7 +7,7 @@ PartOf=ryzen-stabilizator.target
 Type=simple
 User=root
 Group=root
-ExecStart=/usr/bin/ryzen-stabilizator --disable-c6
+ExecStart=/usr/bin/ryzen-stabilizator --config=/etc/ryzen-stabilizator/ryzen-stabilizator.toml --profile=resume
 
 [Install]
 WantedBy=suspend.target
