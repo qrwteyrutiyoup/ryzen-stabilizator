@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/klauspost/cpuid"
 	"github.com/qrwteyrutiyoup/ryzen-stabilizator/boosting"
 	"github.com/qrwteyrutiyoup/ryzen-stabilizator/c6"
 )
@@ -25,17 +26,39 @@ import (
 const (
 	program   = "Ryzen Stabilizator Tabajara"
 	copyright = "Copyright (C) 2018 Sergio Correia <sergio@correia.cc>"
+
+	// The family number for Zen processors.
+	amdZenFamily = 0x17
 )
 
 var (
 	version = "unspecified/git version"
 )
 
+// sanityCheck performs a few checks to be sure we should be running this
+// program.
+func sanityCheck() error {
+	switch {
+	// Check if we are running on an AMD processor.
+	case cpuid.CPU.VendorID != cpuid.AMD:
+		return fmt.Errorf("this is not an AMD processor")
+	// Check if it is the right family, 17h (Zen).
+	case cpuid.CPU.Family != amdZenFamily:
+		return fmt.Errorf("wrong family of AMD processors; expected 23 (17h), got %d", cpuid.CPU.Family)
+	// Check if we are running as root.
+	case os.Geteuid() != 0:
+		return fmt.Errorf("you need to be root to use this program")
+	}
+
+	return nil
+}
+
 func main() {
 	fmt.Printf("%s %s\n%s\n\n", program, version, copyright)
-	// Check if we are running as root.
-	if os.Geteuid() != 0 {
-		fmt.Printf("You need to be root to use this program.\n")
+
+	err := sanityCheck()
+	if err != nil {
+		fmt.Printf("Error: %v.\n", err)
 		return
 	}
 
