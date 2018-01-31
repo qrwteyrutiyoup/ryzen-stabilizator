@@ -59,8 +59,7 @@ sudo ./ryzen-stabilizator --disable-boosting
 Ryzen Stabilizator Tabajara unspecified/git version
 Copyright (C) 2018 Sergio Correia <sergio@correia.cc>
 
-Enabling processor boosting:   SUCCESS
+Disabling processor boosting:   SUCCESS
 
 C6 C-state is DISABLED.
-Processor boosting is ENABLED.
-```
+Processor boosting is DISABLED.

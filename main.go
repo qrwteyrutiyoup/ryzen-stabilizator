@@ -225,7 +225,7 @@ func main() {
 	// Boosting.
 	switch {
 	case *disableBoostingPtr:
-		enableBoosting()
+		disableBoosting()
 	case *enableBoostingPtr:
 		enableBoosting()
 	}
