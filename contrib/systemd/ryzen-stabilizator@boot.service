@@ -6,7 +6,7 @@ PartOf=ryzen-stabilizator.target
 Type=simple
 User=root
 Group=root
-ExecStart=/usr/bin/ryzen-stabilizator --config=/etc/ryzen-stabilizator/ryzen-stabilizator.toml --profile=boot
+ExecStart=/usr/bin/ryzen-stabilizator --config=/etc/ryzen-stabilizator/profiles.toml --profile=boot
 
 [Install]
 WantedBy=multi-user.target
