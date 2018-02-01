@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"runtime"
 	"strings"
 
 	"github.com/BurntSushi/toml"
@@ -52,6 +53,9 @@ type rsSettings struct {
 // program.
 func sanityCheck() error {
 	switch {
+	// Check if we are running Linux.
+	case runtime.GOOS != "linux":
+		return fmt.Errorf("this program can only run under Linux")
 	// Check if we are running on an AMD processor.
 	case cpuid.CPU.VendorID != cpuid.AMD:
 		return fmt.Errorf("this is not an AMD processor")
