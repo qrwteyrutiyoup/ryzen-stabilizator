@@ -1,0 +1,26 @@
+# Configuration file for Ryzen Stabilizator Tabajara.
+#
+# The allowed keys are `c6' to refer to the C6 C-state, `boosting', to refer
+# to processor boosting and `aslr', to refer to address space layout
+# randomization (ASLR). The accepted values are either "enabled" or "disabled".
+#
+# If they are not mentioned, ryzen-stabilizator will not do anything with regard
+# to them.
+#
+#
+# E.g.:
+#
+# boosting = "disable"
+#
+# In the above case, we only define the `bosting' key, and hence it indicates
+# that we should disable processor boosting. Nothing will be done with regard to
+# C6 C-state or ASLR.
+#
+# To tell ryzen-stabilizator to use this config file, you can do the following:
+# ryzen-stabilizator --config=<path to this config file>
+#
+#
+aslr = "disable"
+c6 = "disable"
+
+# vim:set ts=2 sw=2 et:

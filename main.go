@@ -22,6 +22,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/klauspost/cpuid"
+	"github.com/qrwteyrutiyoup/ryzen-stabilizator/aslr"
 	"github.com/qrwteyrutiyoup/ryzen-stabilizator/boosting"
 	"github.com/qrwteyrutiyoup/ryzen-stabilizator/c6"
 )
@@ -38,19 +39,13 @@ var (
 	version = "unspecified/git version"
 )
 
-// rsProfile represents a single profile, in which we may have definitions for
-// both C6 C-state and processor boosting. Both of these parameters are string
-// and accept values `enabled' and `disabled'.
-type rsProfile struct {
+// rsSettings contains definitions for C6 C-state, processor boosting and
+// address space layout randomization (ASLR). All these parameters are "string"
+// and accept as values `enabled' and `disabled'.
+type rsSettings struct {
 	C6       string `toml:"c6"`
 	Boosting string `toml:"boosting"`
-}
-
-// rsConfig represents the config file for Ryzen Stabilizator, with its two
-// profiles, `Boot' and `Resume'.
-type rsConfig struct {
-	Boot   rsProfile `toml:"boot"`
-	Resume rsProfile `toml:"resume"`
+	ASLR     string `toml:"aslr"`
 }
 
 // sanityCheck performs a few checks to be sure we should be running this
@@ -114,6 +109,28 @@ func enableBoosting() {
 	fmt.Println("SUCCESS")
 }
 
+// disableASLR disables address space layout randomization (ASLR).
+func disableASLR() {
+	fmt.Printf("Disabling address space layout randomization (ASLR):   ")
+	err := aslr.Disable()
+	if err != nil {
+		fmt.Printf("oops: %v\n", err)
+		return
+	}
+	fmt.Println("SUCCESS")
+}
+
+// enableASLR enables address space layout randomization (ASLR).
+func enableASLR() {
+	fmt.Printf("Enabling address space layout randomization (ASLR):   ")
+	err := aslr.Enable()
+	if err != nil {
+		fmt.Printf("oops: %v\n", err)
+		return
+	}
+	fmt.Println("SUCCESS")
+}
+
 // showStatus displays the current status of both C6 C-state and processor
 // boosting.
 func showStatus() {
@@ -128,6 +145,17 @@ func showStatus() {
 	}
 	fmt.Printf("\n%s\n", c6Status)
 
+	aslrStatus := "ASLR is DISABLED."
+	aslrEnabled, err := aslr.Enabled()
+	if err == nil {
+		if aslrEnabled {
+			aslrStatus = "ASLR is ENABLED."
+		}
+	} else {
+		aslrStatus = fmt.Sprintf("Error while obtaining status of ASLR: %v", err)
+	}
+	fmt.Println(aslrStatus)
+
 	boostingEnabled, err := boosting.Enabled()
 	boostingStatus := "Processor boosting is DISABLED."
 	if err == nil {
@@ -140,24 +168,8 @@ func showStatus() {
 	fmt.Println(boostingStatus)
 }
 
-func handleConfigurationFile(configFile, profileName string) {
-	config := rsConfig{}
-	selectedProfile := &rsProfile{}
-
-	switch strings.ToLower(profileName) {
-	case "":
-		fmt.Printf("Error: you need to specify a profile available in the provided configuration file.\nE.g.: %s --config=%q --profile=%q\n\n", os.Args[0], configFile, "boot")
-		return
-	case "boot":
-		selectedProfile = &config.Boot
-		break
-	case "resume":
-		selectedProfile = &config.Resume
-		break
-	default:
-		fmt.Printf("Error: invalid profile %q; valid profiles are %q and %q\n", profileName, "boot", "resume")
-		return
-	}
+func handleConfigurationFile(configFile string) {
+	settings := rsSettings{}
 
 	// Reading and parsing the configuration file provided.
 	buf, err := ioutil.ReadFile(configFile)
@@ -166,25 +178,32 @@ func handleConfigurationFile(configFile, profileName string) {
 		return
 	}
 
-	if _, err = toml.Decode(string(buf), &config); err != nil {
+	if _, err = toml.Decode(string(buf), &settings); err != nil {
 		fmt.Printf("Error: problem parsing config file %q: %v.\n\n", configFile, err)
 		return
 	}
 
-	// Now we perform the actions indicated by the specified profile.
-	fmt.Printf("Config file: %q; profile: %q\n", configFile, profileName)
-	switch strings.ToLower(selectedProfile.Boosting) {
+	// Now we perform the actions indicated by the config file.
+	fmt.Printf("Config file: %q\n", configFile)
+	switch strings.ToLower(settings.Boosting) {
 	case "enable":
 		enableBoosting()
 	case "disable":
 		disableBoosting()
 	}
-	switch strings.ToLower(selectedProfile.C6) {
+	switch strings.ToLower(settings.C6) {
 	case "enable":
 		enableC6()
 	case "disable":
 		disableC6()
 	}
+	switch strings.ToLower(settings.ASLR) {
+	case "enable":
+		enableASLR()
+	case "disable":
+		disableASLR()
+	}
+
 	// Current status of both C6 C-state and processor boosting.
 	showStatus()
 }
@@ -198,17 +217,19 @@ func main() {
 		return
 	}
 
-	configFilePtr := flag.String("config", "", "ryzen-stabilizator config file; requires a profile to be specified")
-	profileNamePtr := flag.String("profile", "", fmt.Sprintf("profile from the provided config file; either %q or %q", "boot", "resume"))
+	configFilePtr := flag.String("config", "", "ryzen-stabilizator config file")
 	enableC6Ptr := flag.Bool("enable-c6", false, "Enable C6 C-state")
 	disableC6Ptr := flag.Bool("disable-c6", false, "Disable C6 C-state")
 	enableBoostingPtr := flag.Bool("enable-boosting", false, "Enable processor boosting")
 	disableBoostingPtr := flag.Bool("disable-boosting", false, "Disable processor boosting")
+	enableASLRPtr := flag.Bool("enable-aslr", false, "Enable address space layout randomization (ASLR)")
+	disableASLRPtr := flag.Bool("disable-aslr", false, "Disable address space layout randomization (ASLR)")
+
 	flag.Parse()
 
 	// Handle config file with associated profile.
 	if *configFilePtr != "" {
-		handleConfigurationFile(*configFilePtr, *profileNamePtr)
+		handleConfigurationFile(*configFilePtr)
 		return
 	}
 
@@ -228,6 +249,14 @@ func main() {
 		disableBoosting()
 	case *enableBoostingPtr:
 		enableBoosting()
+	}
+
+	// ASLR.
+	switch {
+	case *disableASLRPtr:
+		disableASLR()
+	case *enableASLRPtr:
+		enableASLR()
 	}
 
 	// Current status of both C6 C-state and processor boosting.
