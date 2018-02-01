@@ -106,6 +106,15 @@ func c6Enabled() (bool, error) {
 	return false, nil
 }
 
+// Available returns a boolean indicating whether we have C6 C-state control
+// available or not. We require the `msr' module for it to be available.
+func Available() bool {
+	if _, err := os.Stat("/dev/cpu/0/msr"); err == nil {
+		return true
+	}
+	return false
+}
+
 // Enable enables C6 C-state.
 func Enable() error {
 	// Passing true to indicate we want C6 enabled.

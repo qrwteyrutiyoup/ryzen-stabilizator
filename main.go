@@ -67,6 +67,11 @@ func sanityCheck() error {
 
 // disableC6 disables C6 C-state.
 func disableC6() {
+	if !c6.Available() {
+		fmt.Println("C6 C-state control unavailable - check if msr module loaded.")
+		return
+	}
+
 	fmt.Printf("Disabling C6 C-state:   ")
 	err := c6.Disable()
 	if err != nil {
@@ -78,6 +83,11 @@ func disableC6() {
 
 // enableC6 enables C6 C-state.
 func enableC6() {
+	if !c6.Available() {
+		fmt.Println("C6 C-state control unavailable - check if msr module loaded.")
+		return
+	}
+
 	fmt.Printf("Enabling C6 C-state:   ")
 	err := c6.Enable()
 	if err != nil {
@@ -89,6 +99,11 @@ func enableC6() {
 
 // disableBoosting disables processor boosting.
 func disableBoosting() {
+	if !boosting.Available() {
+		fmt.Println("Processor boosting unavailable - check if AMD Cool'n'Quiet enabled and cpufreq module loaded.")
+		return
+	}
+
 	fmt.Printf("Disabling processor boosting:   ")
 	err := boosting.Disable()
 	if err != nil {
@@ -100,6 +115,11 @@ func disableBoosting() {
 
 // enableBoosting enables processor boosting.
 func enableBoosting() {
+	if !boosting.Available() {
+		fmt.Println("Processor boosting unavailable - check if AMD Cool'n'Quiet enabled and cpufreq module loaded.")
+		return
+	}
+
 	fmt.Printf("Enabling processor boosting:   ")
 	err := boosting.Enable()
 	if err != nil {
@@ -131,19 +151,22 @@ func enableASLR() {
 	fmt.Println("SUCCESS")
 }
 
-// showStatus displays the current status of both C6 C-state and processor
-// boosting.
+// showStatus displays the current status, if available, of C6 C-state,
+// processor boosting and address space layout randomization (ASLR).
 func showStatus() {
-	c6Status := "C6 C-state is DISABLED."
-	c6Enabled, err := c6.Enabled()
-	if err == nil {
-		if c6Enabled {
-			c6Status = "C6 C-state is ENABLED."
+	fmt.Println("")
+	if c6.Available() {
+		c6Status := "C6 C-state is DISABLED."
+		c6Enabled, err := c6.Enabled()
+		if err == nil {
+			if c6Enabled {
+				c6Status = "C6 C-state is ENABLED."
+			}
+		} else {
+			c6Status = fmt.Sprintf("Error while obtaining status of C6 C-state: %v", err)
 		}
-	} else {
-		c6Status = fmt.Sprintf("Error while obtaining status of C6 C-state: %v", err)
+		fmt.Println(c6Status)
 	}
-	fmt.Printf("\n%s\n", c6Status)
 
 	aslrStatus := "ASLR is DISABLED."
 	aslrEnabled, err := aslr.Enabled()
@@ -156,16 +179,18 @@ func showStatus() {
 	}
 	fmt.Println(aslrStatus)
 
-	boostingEnabled, err := boosting.Enabled()
-	boostingStatus := "Processor boosting is DISABLED."
-	if err == nil {
-		if boostingEnabled {
-			boostingStatus = "Processor boosting is ENABLED."
+	if boosting.Available() {
+		boostingEnabled, err := boosting.Enabled()
+		boostingStatus := "Processor boosting is DISABLED."
+		if err == nil {
+			if boostingEnabled {
+				boostingStatus = "Processor boosting is ENABLED."
+			}
+		} else {
+			boostingStatus = fmt.Sprintf("Error while obtaining status of processor boosting: %v", err)
 		}
-	} else {
-		boostingStatus = fmt.Sprintf("Error while obtaining status of processor boosting: %v", err)
+		fmt.Println(boostingStatus)
 	}
-	fmt.Println(boostingStatus)
 }
 
 func handleConfigurationFile(configFile string) {

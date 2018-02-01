@@ -15,6 +15,7 @@ package boosting
 
 import (
 	"io/ioutil"
+	"os"
 	"strings"
 )
 
@@ -30,6 +31,16 @@ func changeProcessorBoosting(enable bool) error {
 		value = []byte("1")
 	}
 	return ioutil.WriteFile(boostingControlFile, value, 0644)
+}
+
+// Available returns a boolean indicating whether we have boosting control
+// available or not. Disabling AMD Cool'n'Quiet, for instance, prevents cpufreq
+// module from loading, which in turn, makes boosting control unavailable.
+func Available() bool {
+	if _, err := os.Stat(boostingControlFile); err == nil {
+		return true
+	}
+	return false
 }
 
 // Enabled returns a boolean indicating whether processor boosting is enabled
