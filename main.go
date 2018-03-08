@@ -40,13 +40,15 @@ var (
 	version = "unspecified/git version"
 )
 
-// rsSettings contains definitions for C6 C-state, processor boosting and
-// address space layout randomization (ASLR). All these parameters are "string"
-// and accept as values `enabled' and `disabled'.
+// rsSettings contains definitions for C6 C-state, processor boosting, address
+// space layout randomization (ASLR) and power supply idle control workaround
+// (PSIC Workaround). All these parameters are "string" and accept as values
+// `enabled' and `disabled'.
 type rsSettings struct {
-	C6       string `toml:"c6"`
-	Boosting string `toml:"boosting"`
-	ASLR     string `toml:"aslr"`
+	C6             string `toml:"c6"`
+	Boosting       string `toml:"boosting"`
+	ASLR           string `toml:"aslr"`
+	PSICWorkaround string `toml:"psicworkaround"`
 }
 
 // sanityCheck performs a few checks to be sure we should be running this
@@ -67,6 +69,38 @@ func sanityCheck() error {
 		return fmt.Errorf("you need to be root to use this program")
 	}
 	return nil
+}
+
+// disablePSICWorkaround disables Power Supply Idle Control workaround.
+func disablePSICWorkaround() {
+	if !c6.Available() {
+		fmt.Println("Power SUpply Idle Control workaround unavailable - check if msr module loaded.")
+		return
+	}
+
+	fmt.Printf("Disabling Power Supply Idle Control Workaround:   ")
+	err := c6.PackageEnable()
+	if err != nil {
+		fmt.Printf("oops: %v\n", err)
+		return
+	}
+	fmt.Println("SUCCESS")
+}
+
+// enablePSICWorkaround enables Power Supply Idle Control workaround.
+func enablePSICWorkaround() {
+	if !c6.Available() {
+		fmt.Println("Power Supply Idle Control workaround unavailable - check if msr module loaded.")
+		return
+	}
+
+	fmt.Printf("Enabling Power Supply Idle Control workaround:   ")
+	err := c6.PackageDisable()
+	if err != nil {
+		fmt.Printf("oops: %v\n", err)
+		return
+	}
+	fmt.Println("SUCCESS")
 }
 
 // disableC6 disables C6 C-state.
@@ -160,6 +194,19 @@ func enableASLR() {
 func showStatus() {
 	fmt.Println("")
 	if c6.Available() {
+		psStatus := "Power Supply Idle Control workaround is ENABLED."
+		psEnabled, err := c6.PackageEnabled()
+		if err == nil {
+			if psEnabled {
+				psStatus = "Power Supply Idle Control workaround is DISABLED."
+			}
+		} else {
+			psStatus = fmt.Sprintf("Error while obtaining status of Power Supply Idle Control workaround: %v", err)
+		}
+		fmt.Println(psStatus)
+	}
+
+	if c6.Available() {
 		c6Status := "C6 C-state is DISABLED."
 		c6Enabled, err := c6.Enabled()
 		if err == nil {
@@ -213,18 +260,24 @@ func handleConfigurationFile(configFile string) {
 	}
 
 	// Now we perform the actions indicated by the config file.
-	fmt.Printf("Config file: %q\n", configFile)
-	switch strings.ToLower(settings.Boosting) {
+	switch strings.ToLower(settings.PSICWorkaround) {
 	case "enable":
-		enableBoosting()
+		enablePSICWorkaround()
 	case "disable":
-		disableBoosting()
+		disablePSICWorkaround()
 	}
+	fmt.Printf("Config file: %q\n", configFile)
 	switch strings.ToLower(settings.C6) {
 	case "enable":
 		enableC6()
 	case "disable":
 		disableC6()
+	}
+	switch strings.ToLower(settings.Boosting) {
+	case "enable":
+		enableBoosting()
+	case "disable":
+		disableBoosting()
 	}
 	switch strings.ToLower(settings.ASLR) {
 	case "enable":
@@ -247,6 +300,8 @@ func main() {
 	}
 
 	configFilePtr := flag.String("config", "", "ryzen-stabilizator config file")
+	enablePSICWorkaroundPtr := flag.Bool("enable-psicworkaround", false, "Enable Power Supply Idle Control Workaround")
+	disablePSICWorkaroundPtr := flag.Bool("disable-psicworkaround", false, "Disable Power Supply Idle Control Workaround")
 	enableC6Ptr := flag.Bool("enable-c6", false, "Enable C6 C-state")
 	disableC6Ptr := flag.Bool("disable-c6", false, "Disable C6 C-state")
 	enableBoostingPtr := flag.Bool("enable-boosting", false, "Enable processor boosting")
@@ -264,6 +319,15 @@ func main() {
 
 	// Regular handling of command-line arguments, if we are not using config
 	// file with predefined profiles.
+
+	// Power Supply Idle Control Workaround.
+	switch {
+	case *disablePSICWorkaroundPtr:
+		disablePSICWorkaround()
+	case *enablePSICWorkaroundPtr:
+		enablePSICWorkaround()
+	}
+
 	// C6.
 	switch {
 	case *disableC6Ptr:

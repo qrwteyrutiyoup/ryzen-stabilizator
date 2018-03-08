@@ -1,20 +1,20 @@
 # Ryzen Stabilizator Tabajara
 
-Simple Go program to enable/disable C6 C-state, processor boosting and address space layout randoization (ASLR) on an AMD Ryzen processor, in order to help with the infamous "MCE-random-reboots-while-idle" issue.
+Simple Go program to enable/disable C6 C-state, processor boosting, address space layout randoization (ASLR) and the Power Supply Idle Control workaround on an AMD Ryzen processor, in order to help with the infamous "MCE-random-reboots-while-idle" issue.
 
 Code licensed under Apache License 2.0.
 
 ## Basic usage:
 
-### Check status of C6 C-state, processor boosting and ASLR:
+### Check status of C6 C-state, processor boosting, ASLR and Power Supply Idle Control workaround:
 ```
-sudo ./ryzen-stabilizator
 Ryzen Stabilizator Tabajara unspecified/git version
 Copyright (C) 2018 Sergio Correia <sergio@correia.cc>
 
 
-C6 C-state is DISABLED.
-ASLR is DISABLED.
+Power Supply Idle Control workaround is ENABLED.
+C6 C-state is ENABLED.
+ASLR is ENABLED.
 Processor boosting is ENABLED.
 ```
 
@@ -26,9 +26,11 @@ Copyright (C) 2018 Sergio Correia <sergio@correia.cc>
 
 Enabling C6 C-state:   SUCCESS
 
+Power Supply Idle Control workaround is DISABLED.
 C6 C-state is ENABLED.
-ASLR is DISABLED.
+ASLR is ENABLED.
 Processor boosting is ENABLED.
+
 ```
 
 ### Disable C6 C-state:
@@ -39,8 +41,9 @@ Copyright (C) 2018 Sergio Correia <sergio@correia.cc>
 
 Disabling C6 C-state:   SUCCESS
 
+Power Supply Idle Control workaround is ENABLED.
 C6 C-state is DISABLED.
-ASLR is DISABLED.
+ASLR is ENABLED.
 Processor boosting is ENABLED.
 ```
 
@@ -52,8 +55,9 @@ Copyright (C) 2018 Sergio Correia <sergio@correia.cc>
 
 Enabling processor boosting:   SUCCESS
 
+Power Supply Idle Control workaround is ENABLED.
 C6 C-state is DISABLED.
-ASLR is DISABLED.
+ASLR is ENABLED.
 Processor boosting is ENABLED.
 ```
 
@@ -65,8 +69,9 @@ Copyright (C) 2018 Sergio Correia <sergio@correia.cc>
 
 Disabling processor boosting:   SUCCESS
 
+Power Supply Idle Control workaround is ENABLED.
 C6 C-state is DISABLED.
-ASLR is DISABLED.
+ASLR is ENABLED.
 Processor boosting is DISABLED.
 ```
 
@@ -78,6 +83,7 @@ Copyright (C) 2018 Sergio Correia <sergio@correia.cc>
 
 Enabling address space layout randomization (ASLR):   SUCCESS
 
+Power Supply Idle Control workaround is ENABLED.
 C6 C-state is DISABLED.
 ASLR is ENABLED.
 Processor boosting is DISABLED.
@@ -91,7 +97,36 @@ Copyright (C) 2018 Sergio Correia <sergio@correia.cc>
 
 Disabling address space layout randomization (ASLR):   SUCCESS
 
+Power Supply Idle Control workaround is ENABLED.
 C6 C-state is DISABLED.
+ASLR is DISABLED.
+Processor boosting is DISABLED.
+```
+
+### Enable Power Supply Idle Control workaround:
+```
+sudo ./ryzen-stabilizator --enable-psicworkaround
+Ryzen Stabilizator Tabajara unspecified/git version
+Copyright (C) 2018 Sergio Correia <sergio@correia.cc>
+
+Enabling Power Supply Idle Control workaround:   SUCCESS
+
+Power Supply Idle Control workaround is ENABLED.
+C6 C-state is DISABLED.
+ASLR is DISABLED.
+Processor boosting is DISABLED.
+```
+
+### Disable Power Supply Idle Control workaround:
+```
+sudo ./ryzen-stabilizator --disable-psicworkaround
+Ryzen Stabilizator Tabajara unspecified/git version
+Copyright (C) 2018 Sergio Correia <sergio@correia.cc>
+
+Disabling Power Supply Idle Control Workaround:   SUCCESS
+
+Power Supply Idle Control workaround is DISABLED.
+C6 C-state is ENABLED.
 ASLR is DISABLED.
 Processor boosting is DISABLED.
 ```

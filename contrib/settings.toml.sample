@@ -1,11 +1,12 @@
 # Configuration file for Ryzen Stabilizator Tabajara.
 #
 # The allowed keys are `c6' to refer to the C6 C-state, `boosting', to refer
-# to processor boosting and `aslr', to refer to address space layout
-# randomization (ASLR). The accepted values are either "enabled" or "disabled".
+# to processor boosting, `aslr', to refer to address space layout randomization
+# (ASLR), and `psicworkaround', to refer to the power supply idle control
+# workaround. The accepted values are either "enabled" or "disabled".
 #
-# If they are not mentioned, ryzen-stabilizator will not do anything with regard
-# to them.
+# If they (keys) are not mentioned, ryzen-stabilizator will not do anything with
+# regard to them.
 #
 #
 # E.g.:
@@ -14,13 +15,20 @@
 #
 # In the above case, we only define the `bosting' key, and hence it indicates
 # that we should disable processor boosting. Nothing will be done with regard to
-# C6 C-state or ASLR.
+# C6 C-state, ASLR, or the power supply workaround.
+#
+# As for the power supply idle control workaround, it seems to disable just C6
+# c-state package, not core. So, if you disable C6 (`c6 = "disable"'), the
+# power supply idle workaround will show as enabled, as ryzen-stabilizator will
+# disable both core and package C6
 #
 # To tell ryzen-stabilizator to use this config file, you can do the following:
 # ryzen-stabilizator --config=<path to this config file>
 #
 #
-aslr = "disable"
-c6 = "disable"
+#aslr = "disable"
+#c6 = "disable"
+#boosting = "disable"
+psicworkaround = "enable"
 
 # vim:set ts=2 sw=2 et:
