@@ -74,7 +74,7 @@ func sanityCheck() error {
 // disablePSICWorkaround disables Power Supply Idle Control workaround.
 func disablePSICWorkaround() {
 	if !c6.Available() {
-		fmt.Println("Power SUpply Idle Control workaround unavailable - check if msr module loaded.")
+		fmt.Println("Power Supply Idle Control workaround unavailable - check if msr module loaded.")
 		return
 	}
 
@@ -260,18 +260,18 @@ func handleConfigurationFile(configFile string) {
 	}
 
 	// Now we perform the actions indicated by the config file.
-	switch strings.ToLower(settings.PSICWorkaround) {
-	case "enable":
-		enablePSICWorkaround()
-	case "disable":
-		disablePSICWorkaround()
-	}
 	fmt.Printf("Config file: %q\n", configFile)
 	switch strings.ToLower(settings.C6) {
 	case "enable":
 		enableC6()
 	case "disable":
 		disableC6()
+	}
+	switch strings.ToLower(settings.PSICWorkaround) {
+	case "enable":
+		enablePSICWorkaround()
+	case "disable":
+		disablePSICWorkaround()
 	}
 	switch strings.ToLower(settings.Boosting) {
 	case "enable":
@@ -319,6 +319,13 @@ func main() {
 
 	// Regular handling of command-line arguments, if we are not using config
 	// file with predefined profiles.
+	// C6.
+	switch {
+	case *disableC6Ptr:
+		disableC6()
+	case *enableC6Ptr:
+		enableC6()
+	}
 
 	// Power Supply Idle Control Workaround.
 	switch {
@@ -326,14 +333,6 @@ func main() {
 		disablePSICWorkaround()
 	case *enablePSICWorkaroundPtr:
 		enablePSICWorkaround()
-	}
-
-	// C6.
-	switch {
-	case *disableC6Ptr:
-		disableC6()
-	case *enableC6Ptr:
-		enableC6()
 	}
 
 	// Boosting.
