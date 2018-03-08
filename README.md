@@ -1,6 +1,6 @@
 # Ryzen Stabilizator Tabajara
 
-Simple Go program to enable/disable C6 C-state, processor boosting, address space layout randoization (ASLR) and the Power Supply Idle Control workaround on an AMD Ryzen processor, in order to help with the infamous "MCE-random-reboots-while-idle" issue.
+Simple Go program to enable/disable C6 C-state, processor boosting, address space layout randomization (ASLR) and the Power Supply Idle Control workaround on an AMD Ryzen processor, in order to help with the infamous "MCE-random-reboots-while-idle" issue.
 
 Code licensed under Apache License 2.0.
 
