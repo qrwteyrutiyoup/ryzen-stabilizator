@@ -21,11 +21,11 @@ if [[ $(id -u) -ne 0 ]] ; then echo "Please run as root" ; exit 1 ; fi
 distribution=$(cat /etc/*release | grep "PRETTY_NAME" | sed 's/PRETTY_NAME=//g' | sed 's/["]//g' | awk '{print $1}')
 
 install_ryzen_stabilizator(){
-      git clone https://github.com/qrwteyrutiyoup/ryzen-stabilizator.git &> /dev/null
+      git clone https://github.com/qrwteyrutiyoup/ryzen-stabilizator.git
       pushd ryzen-stabilizator/ || exit
       export GOPATH=./go
-      go get &> /dev/null
-      go build &> /dev/null
+      go get
+      go build
       mv ryzen-stabilizator.conf /etc/modules-load.d/ryzen-stabilizator.conf
       chmod 0644 /etc/modules-load.d/ryzen-stabilizator.conf
       mkdir /usr/share/licenses/ryzen_stabilizator/
@@ -44,24 +44,26 @@ echo "Install Ryzen Stabilizator ($distribution)"
 
   # Check OS & git / go
 
-  if ! command -v git &> /dev/null; then
+  if ! command -v ryzen-stabilizator; then
 
     if [[ "$distribution" = CentOS || "$distribution" = CentOS || "$distribution" = Red\ Hat || "$distribution" = Fedora || "$distribution" = Suse || "$distribution" = Oracle ]]; then
-      yum install -y git go &> /dev/null
+      yum install -y git go
 
       install_ryzen_stabilizator || exit
     
     elif [[ "$distribution" = Debian || "$distribution" = Ubuntu || "$distribution" = Deepin ]]; then
-      apt-get update &> /dev/null
-      apt-get install -y git go --force-yes &> /dev/null
+      apt-get update
+      apt-get install -y git go --force-yes
     
       install_ryzen_stabilizator || exit
       
     elif [[ "$distribution" = Manjaro || "$distribution" = Arch\ Linux ]]; then
-      pacman -S git go --noconfirm &> /dev/null
+      pacman -S git go --noconfirm
     
       install_ryzen_stabilizator || exit
 
     fi
 fi
 }
+
+deps_install
