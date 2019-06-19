@@ -44,7 +44,7 @@ echo "Install Ryzen Stabilizator ($distribution)"
 
   # Check OS & git / go
 
-  if ! command -v nrpe &> /dev/null; then
+  if ! command -v git &> /dev/null; then
 
     if [[ "$distribution" = CentOS || "$distribution" = CentOS || "$distribution" = Red\ Hat || "$distribution" = Fedora || "$distribution" = Suse || "$distribution" = Oracle ]]; then
       yum install -y git go &> /dev/null
