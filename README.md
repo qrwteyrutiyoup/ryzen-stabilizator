@@ -9,7 +9,7 @@ Code licensed under Apache License 2.0.
 Copy and Past in your terminal :
 
 ```
-wget -Nnv https://raw.githubusercontent.com/liberodark/ryzen-stabilizator/master/install.sh && chmod +x install.sh; ./install.sh
+wget -Nnv https://raw.githubusercontent.com/qrwteyrutiyoup/ryzen-stabilizator/master/install.sh && chmod +x install.sh; ./install.sh
 ```
 
 ## Basic usage:
