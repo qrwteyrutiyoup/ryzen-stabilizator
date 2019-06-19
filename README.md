@@ -4,7 +4,7 @@ Simple Go program to enable/disable C6 C-state, processor boosting, address spac
 
 Code licensed under Apache License 2.0.
 
-How to use :
+## How to install :
 
 Copy and Past in your terminal :
 
