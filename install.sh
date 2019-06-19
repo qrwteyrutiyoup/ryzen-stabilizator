@@ -21,22 +21,26 @@ if [[ $(id -u) -ne 0 ]] ; then echo "Please run as root" ; exit 1 ; fi
 distribution=$(cat /etc/*release | grep "PRETTY_NAME" | sed 's/PRETTY_NAME=//g' | sed 's/["]//g' | awk '{print $1}')
 
 install_ryzen_stabilizator(){
-      git clone https://github.com/qrwteyrutiyoup/ryzen-stabilizator.git
+      git clone https://github.com/qrwteyrutiyoup/ryzen-stabilizator.git &> /dev/null
       pushd ryzen-stabilizator/ || exit
-      export GOPATH=./go
-      go get
-      go build
-      mv ryzen-stabilizator.conf /etc/modules-load.d/ryzen-stabilizator.conf
+      #export GOPATH=./go
+      go get &> /dev/null
+      go build &> /dev/null
+      touch ryzen-stabilizator.conf
+      echo -e "# msr module is required by ryzen-stabilizator." >> "ryzen-stabilizator.conf"
+      echo -e "msr" >> "ryzen-stabilizator.conf"
+      cp -a ./ryzen-stabilizator.conf /etc/modules-load.d/ryzen-stabilizator.conf
       chmod 0644 /etc/modules-load.d/ryzen-stabilizator.conf
-      mkdir /usr/share/licenses/ryzen_stabilizator/
-      mv LICENSE /usr/share/licenses/ryzen_stabilizator/LICENSE
-      mv ./contrib/systemd/ryzen* /usr/lib/systemd/system/
-      mkdir /etc/ryzen-stabilizator/
-      mv ./contrib/settings* /etc/ryzen-stabilizator/settings.toml
+      mkdir -p /usr/share/licenses/ryzen_stabilizator/
+      cp -a LICENSE /usr/share/licenses/ryzen_stabilizator/LICENSE
+      cp -a ./contrib/systemd/ryzen* /usr/lib/systemd/system/
+      mkdir -p /etc/ryzen-stabilizator/
+      cp -a ./contrib/settings* /etc/ryzen-stabilizator/settings.toml
       chmod 0644 /etc/ryzen-stabilizator/settings.toml
-      mv ./ryzen-stabilizator-master /usr/bin/ryzen-stabilizator
+      cp -a ./ryzen-stabilizator /usr/bin/ryzen-stabilizator
       chmod 0755 /usr/bin/ryzen-stabilizator
       popd || exit
+      echo "Install Ryzen Stabilizator Finish"
 }
 
 deps_install(){
@@ -47,18 +51,18 @@ echo "Install Ryzen Stabilizator ($distribution)"
   if ! command -v ryzen-stabilizator; then
 
     if [[ "$distribution" = CentOS || "$distribution" = CentOS || "$distribution" = Red\ Hat || "$distribution" = Fedora || "$distribution" = Suse || "$distribution" = Oracle ]]; then
-      yum install -y git go
+      yum install -y git golang-go &> /dev/null
 
       install_ryzen_stabilizator || exit
     
-    elif [[ "$distribution" = Debian || "$distribution" = Ubuntu || "$distribution" = Deepin ]]; then
+    elif [[ "$distribution" = Debian || "$distribution" = Ubuntu || "$distribution" = Deepin || "$distribution" = KDE ]]; then
       apt-get update
-      apt-get install -y git go --force-yes
+      apt-get install -y git golang-go --force-yes &> /dev/null
     
       install_ryzen_stabilizator || exit
       
     elif [[ "$distribution" = Manjaro || "$distribution" = Arch\ Linux ]]; then
-      pacman -S git go --noconfirm
+      pacman -S git go --noconfirm &> /dev/null
     
       install_ryzen_stabilizator || exit
 
