@@ -4,6 +4,14 @@ Simple Go program to enable/disable C6 C-state, processor boosting, address spac
 
 Code licensed under Apache License 2.0.
 
+How to use :
+
+Copy and Past in your terminal :
+
+```
+git clone https://github.com/qrwteyrutiyoup/ryzen-stabilizator && cd ryzen-stabilizator && chmod +x install.sh; ./install.sh
+```
+
 ## Basic usage:
 
 ### Check status of C6 C-state, processor boosting, ASLR and Power Supply Idle Control workaround:
