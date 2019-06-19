@@ -33,7 +33,7 @@ install_ryzen_stabilizator(){
       chmod 0644 /etc/modules-load.d/ryzen-stabilizator.conf
       mkdir -p /usr/share/licenses/ryzen_stabilizator/
       cp -a LICENSE /usr/share/licenses/ryzen_stabilizator/LICENSE
-      cp -a ./contrib/systemd/ryzen* /usr/lib/systemd/system/
+      cp -a ./contrib/systemd/ryzen* /etc/systemd/system/
       mkdir -p /etc/ryzen-stabilizator/
       cp -a ./contrib/settings* /etc/ryzen-stabilizator/settings.toml
       chmod 0644 /etc/ryzen-stabilizator/settings.toml
